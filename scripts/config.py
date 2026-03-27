@@ -13,7 +13,7 @@ STATE_PATH = "state/progress.json"
 # ── Bible PDF Paths ───────────────────────────────────────────────────────────
 BIBLE_PATHS = {
     "english": "bibles/Holy_Bible_English_NIV.pdf",
-    "hindi":   "bibles/Holy_bible_पवित्र_बाइबिल_Hindi.pdf",
+    "hindi": "bibles/Holy_Bible_Hindi.pdf",
     "marathi": "bibles/Holy_Bible_Marathi.pdf",
     "kannada": "bibles/Holy_Bible_Kannada.pdf",
 }
