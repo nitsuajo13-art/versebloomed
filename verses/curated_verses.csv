@@ -1,4 +1,5 @@
 id,book,chapter,verse,english_ref,hindi_ref,marathi_ref,kannada_ref,topic,used,used_date
+0,Revelation,1,8,Revelation 1:8,प्रकाशितवाक्य 1:8,प्रकटीकरण 1:8,ಪ್ರಕಟನೆ 1:8,Test,false,
 1,Deuteronomy,6,5,Deuteronomy 6:5,व्यवस्थाविवरण 6:5,अनुवाद 6:5,ಧರ್ಮೋಪದೇಶಕಾಂಡ 6:5,Love,false,
 2,Leviticus,19,18,Leviticus 19:18,लेवीय 19:18,लेवीय 19:18,ಯಾಜಕಕಾಂಡ 19:18,Love,false,
 3,Proverbs,10,12,Proverbs 10:12,नीतिवचन 10:12,नीतिसूत्रे 10:12,ಜ್ಞಾನೋಕ್ತಿಗಳು 10:12,Love,false,
