@@ -1,0 +1,66 @@
+name: 🌸 VerseBloomed — Daily Posts
+
+on:
+  schedule:
+    - cron: '0 3 * * *'    # 8:30 AM IST (3:00 AM UTC)
+    - cron: '0 13 * * *'   # 6:30 PM IST (1:00 PM UTC)
+  workflow_dispatch:        # Manual trigger from GitHub UI
+
+jobs:
+  generate-and-post:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: 📦 Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: 🖋️ Install Fonts
+        run: |
+          mkdir -p ~/.fonts
+          cp fonts/*.ttf ~/.fonts/
+          fc-cache -f -v
+
+      - name: 🕐 Determine Session
+        id: session
+        run: |
+          HOUR=$(date -u +%H)
+          if [ "$HOUR" -lt 12 ]; then
+            echo "SESSION=morning" >> $GITHUB_OUTPUT
+          else
+            echo "SESSION=evening" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 🌸 Generate 4 Slides
+        run: python scripts/main.py ${{ steps.session.outputs.SESSION }}
+
+      - name: 📤 Upload Images as Artifacts (for review)
+        uses: actions/upload-artifact@v4
+        with:
+          name: versebloomed-${{ steps.session.outputs.SESSION }}-${{ github.run_number }}
+          path: output/
+          retention-days: 7
+
+      - name: 📸 Post to Instagram
+        env:
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_ACCOUNT_ID:   ${{ secrets.INSTAGRAM_ACCOUNT_ID }}
+          CLOUDINARY_CLOUD_NAME:  ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY:     ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET:  ${{ secrets.CLOUDINARY_API_SECRET }}
+        run: python scripts/post_instagram.py ${{ steps.session.outputs.SESSION }}
+
+      - name: 💾 Commit Progress
+        run: |
+          git config --global user.name "VerseBloomed Bot"
+          git config --global user.email "bot@versebloomed.com"
+          git add verses/curated_verses.csv
+          git diff --staged --quiet || git commit -m "🌸 ${{ steps.session.outputs.SESSION }} verse posted — $(date +'%Y-%m-%d')"
+          git push
