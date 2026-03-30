@@ -54,7 +54,7 @@ def run(session="morning"):
 
     # Extract verse text from all 4 PDFs
     print("📄 Extracting verse text from Bible PDFs...")
-    verse_texts = extract_all_languages(book, chapter, v)
+    verse_texts = extract_all_languages(verse.to_dict())
 
     # Handle any failed extractions — find random extractable verse
     unused = df[df["used"] == False]
