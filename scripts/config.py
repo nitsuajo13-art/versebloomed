@@ -7,8 +7,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # ── DEBUG — Print paths so we can verify in logs ──────────────────────────────
 print(f"🔍 BASE_DIR: {BASE_DIR}")
-print(f"🔍 English PDF path: {os.path.join(BASE_DIR, 'bibles', 'Holy_Bible_English_NIV.pdf')}")
-print(f"🔍 PDF exists: {os.path.exists(os.path.join(BASE_DIR, 'bibles', 'Holy_Bible_English_NIV.pdf'))}")
 print(f"🔍 Bibles folder contents: {os.listdir(os.path.join(BASE_DIR, 'bibles')) if os.path.exists(os.path.join(BASE_DIR, 'bibles')) else 'FOLDER NOT FOUND'}")
 
 # ── Canvas ────────────────────────────────────────────────────────────────────
@@ -20,8 +18,10 @@ CSV_PATH   = os.path.join(BASE_DIR, "verses", "curated_verses.csv")
 STATE_PATH = os.path.join(BASE_DIR, "state", "progress.json")
 
 # ── Bible PDF Paths ───────────────────────────────────────────────────────────
+# NOTE: English now uses Bible API — PDF kept as fallback only
+# IMPORTANT: Check exact filename on GitHub — look for capital letters carefully
 BIBLE_PATHS = {
-    "english": os.path.join(BASE_DIR, "bibles", "Holy_Bible_English_NIV.pdf"),
+    "english": os.path.join(BASE_DIR, "bibles", "Holy_BIble_English_NIV.pdf"),
     "hindi":   os.path.join(BASE_DIR, "bibles", "Holy_Bible_Hindi.pdf"),
     "marathi": os.path.join(BASE_DIR, "bibles", "Holy_Bible_Marathi.pdf"),
     "kannada": os.path.join(BASE_DIR, "bibles", "Holy_Bible_Kannada.pdf"),
