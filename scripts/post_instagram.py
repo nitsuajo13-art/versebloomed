@@ -5,7 +5,7 @@ import cloudinary
 import cloudinary.uploader
 import os
 import sys
-import glob
+import time
 import pandas as pd
 from datetime import datetime
 from config import (
@@ -55,7 +55,7 @@ def upload_carousel_item(image_url):
         "is_carousel_item": True,
         "access_token":     INSTAGRAM_ACCESS_TOKEN,
     }
-    resp = requests.post(url, data=params)
+    resp = requests.post(url, data=params, timeout=30)
     data = resp.json()
     if "id" in data:
         print(f"  📸 IG item uploaded: {data['id']}")
@@ -74,7 +74,7 @@ def create_carousel_container(children_ids, caption):
         "caption":      caption,
         "access_token": INSTAGRAM_ACCESS_TOKEN,
     }
-    resp = requests.post(url, data=params)
+    resp = requests.post(url, data=params, timeout=30)
     data = resp.json()
     if "id" in data:
         print(f"  📦 Carousel container: {data['id']}")
@@ -91,7 +91,7 @@ def publish_carousel(container_id):
         "creation_id":  container_id,
         "access_token": INSTAGRAM_ACCESS_TOKEN,
     }
-    resp = requests.post(url, data=params)
+    resp = requests.post(url, data=params, timeout=30)
     data = resp.json()
     if "id" in data:
         print(f"  🎉 Published! Post ID: {data['id']}")
@@ -99,6 +99,20 @@ def publish_carousel(container_id):
     else:
         print(f"  ❌ Publish failed: {data}")
         return None
+
+
+def publish_with_retry(container_id, retries=3):
+    """Retry publishing up to 3 times with 10 second wait between attempts."""
+    for i in range(retries):
+        print(f"  🚀 Publish attempt {i+1} of {retries}...")
+        post_id = publish_carousel(container_id)
+        if post_id:
+            return post_id
+        if i < retries - 1:
+            print(f"  ⏳ Waiting 10 seconds before retry...")
+            time.sleep(10)
+    print("  ❌ All publish attempts failed.")
+    return None
 
 
 # ── Build Caption ─────────────────────────────────────────────────────────────
@@ -117,9 +131,9 @@ def build_caption(english_verse, english_ref, run_number):
 
 def post_carousel(session, verse_row):
     """Full pipeline: upload images → post carousel to Instagram."""
-    date_str    = datetime.now().strftime("%Y-%m-%d")
-    folder      = os.path.join(OUTPUT_DIR, f"{date_str}_{session}")
-    lang_order  = ["english", "hindi", "marathi", "kannada"]
+    date_str   = datetime.now().strftime("%Y-%m-%d")
+    folder     = os.path.join(OUTPUT_DIR, f"{date_str}_{session}")
+    lang_order = ["english", "hindi", "marathi", "kannada"]
 
     print(f"\n📸 Uploading {session} carousel to Instagram...\n")
 
@@ -132,7 +146,7 @@ def post_carousel(session, verse_row):
         if url:
             public_urls.append(url)
         else:
-            print(f"❌ Failed to upload {lang} slide. Aborting post.")
+            print(f"  ❌ Failed to upload {lang} slide. Aborting post.")
             return False
 
     # Step 2 — Upload each image to Instagram as carousel item
@@ -142,11 +156,11 @@ def post_carousel(session, verse_row):
         if item_id:
             children_ids.append(item_id)
         else:
-            print("❌ Failed to create Instagram carousel item. Aborting.")
+            print("  ❌ Failed to create Instagram carousel item. Aborting.")
             return False
 
     # Step 3 — Build caption
-    run_number = int(datetime.now().strftime("%j"))  # Day of year for rotation
+    run_number = int(datetime.now().strftime("%j"))
     caption    = build_caption(
         verse_row.get("english_verse", ""),
         verse_row.get("english_ref", ""),
@@ -158,8 +172,12 @@ def post_carousel(session, verse_row):
     if not container_id:
         return False
 
-    # Step 5 — Publish
-    post_id = publish_carousel(container_id)
+    # ── CRITICAL FIX: Wait for Instagram to process media ────────────────────
+    print("  ⏳ Waiting 30 seconds for Instagram to process media...")
+    time.sleep(30)
+
+    # Step 5 — Publish with retry logic
+    post_id = publish_with_retry(container_id, retries=3)
     return post_id is not None
 
 
@@ -170,7 +188,7 @@ if __name__ == "__main__":
     try:
         df       = pd.read_csv(CSV_PATH)
         last_row = df[df["used"] == True].iloc[-1].to_dict()
-    except:
+    except Exception:
         last_row = {"english_verse": "", "english_ref": ""}
 
     success = post_carousel(session, last_row)

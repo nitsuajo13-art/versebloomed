@@ -2,30 +2,33 @@
 
 import os
 
+# ── Base Directory (absolute path fix for GitHub Actions) ─────────────────────
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 # ── Canvas ────────────────────────────────────────────────────────────────────
 CANVAS_SIZE = (1080, 1080)
-OUTPUT_DIR  = "output"
+OUTPUT_DIR  = os.path.join(BASE_DIR, "output")
 
 # ── File Paths ────────────────────────────────────────────────────────────────
-CSV_PATH   = "verses/curated_verses.csv"
-STATE_PATH = "state/progress.json"
+CSV_PATH   = os.path.join(BASE_DIR, "verses", "curated_verses.csv")
+STATE_PATH = os.path.join(BASE_DIR, "state", "progress.json")
 
 # ── Bible PDF Paths ───────────────────────────────────────────────────────────
 BIBLE_PATHS = {
-    "english": "bibles/Holy_Bible_English_NIV.pdf",
-    "hindi": "bibles/Holy_Bible_Hindi.pdf",
-    "marathi": "bibles/Holy_Bible_Marathi.pdf",
-    "kannada": "bibles/Holy_Bible_Kannada.pdf",
+    "english": os.path.join(BASE_DIR, "bibles", "Holy_Bible_English_NIV.pdf"),
+    "hindi":   os.path.join(BASE_DIR, "bibles", "Holy_Bible_Hindi.pdf"),
+    "marathi": os.path.join(BASE_DIR, "bibles", "Holy_Bible_Marathi.pdf"),
+    "kannada": os.path.join(BASE_DIR, "bibles", "Holy_Bible_Kannada.pdf"),
 }
 
 # ── Font Paths ────────────────────────────────────────────────────────────────
 FONTS = {
-    "playfair":        "fonts/PlayfairDisplay-Regular.ttf",
-    "playfair_italic": "fonts/PlayfairDisplay-Italic.ttf",
-    "playfair_bold":   "fonts/PlayfairDisplay-Bold.ttf",
-    "devanagari":      "fonts/NotoSerifDevanagari-Regular.ttf",
-    "devanagari_med":  "fonts/NotoSerifDevanagari-Medium.ttf",
-    "kannada":         "fonts/NotoSerifKannada-Regular.ttf",
+    "playfair":        os.path.join(BASE_DIR, "fonts", "PlayfairDisplay-Regular.ttf"),
+    "playfair_italic": os.path.join(BASE_DIR, "fonts", "PlayfairDisplay-Italic.ttf"),
+    "playfair_bold":   os.path.join(BASE_DIR, "fonts", "PlayfairDisplay-Bold.ttf"),
+    "devanagari":      os.path.join(BASE_DIR, "fonts", "NotoSerifDevanagari-Regular.ttf"),
+    "devanagari_med":  os.path.join(BASE_DIR, "fonts", "NotoSerifDevanagari-Medium.ttf"),
+    "kannada":         os.path.join(BASE_DIR, "fonts", "NotoSerifKannada-Regular.ttf"),
 }
 
 # ── Language Order ────────────────────────────────────────────────────────────
